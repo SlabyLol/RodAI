@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RodAI - Your AI Assistant</title>
+    <script src="https://js.puter.com/v2/"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+        
+        :root {
+            --primary: #00ff9d;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a, #1a1a2e);
+            color: #fff;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: rgba(20, 20, 40, 0.95);
+            border-right: 1px solid rgba(0, 255, 157, 0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .logo {
+            padding: 24px;
+            font-size: 32px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            color: var(--primary);
+            border-bottom: 1px solid rgba(0, 255, 157, 0.2);
+        }
+        
+        .nav {
+            flex: 1;
+            padding: 20px;
+        }
+        
+        .nav-item {
+            padding: 14px 16px;
+            margin-bottom: 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .nav-item:hover, .nav-item.active {
+            background: rgba(0, 255, 157, 0.1);
+            color: var(--primary);
+        }
+        
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .message {
+            max-width: 80%;
+            padding: 14px 18px;
+            border-radius: 18px;
+            line-height: 1.5;
+        }
+        
+        .user {
+            align-self: flex-end;
+            background: #00ff9d;
+            color: black;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .ai {
+            align-self: flex-start;
+            background: rgba(255,255,255,0.1);
+            border-bottom-left-radius: 4px;
+        }
+        
+        /* Input Area */
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .input-box {
+            display: flex;
+            gap: 12px;
+            background: rgba(30,30,50,0.8);
+            border-radius: 9999px;
+            padding: 8px;
+        }
+        
+        input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: white;
+            font-size: 16px;
+            padding: 12px 20px;
+        }
+        
+        button {
+            background: var(--primary);
+            color: black;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+        }
+        
+        /* File Section */
+        .files-panel {
+            width: 320px;
+            background: rgba(15,15,35,0.95);
+            border-left: 1px solid rgba(0,255,157,0.2);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            font-weight: 600;
+        }
+        
+        .file-list {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        .file-item {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 6px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        
+        .file-item:hover {
+            background: rgba(0,255,157,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="logo">RodAI</div>
+            <div class="nav">
+                <div class="nav-item active"><i class="fas fa-comments"></i> Chat</div>
+                <div class="nav-item" onclick="showFiles()"><i class="fas fa-folder"></i> Files</div>
+                <div class="nav-item"><i class="fas fa-image"></i> Image Generation</div>
+                <div class="nav-item"><i class="fas fa-code"></i> Code Assistant</div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area">
+            <div class="header">
+                <h2>RodAI <span style="font-size:14px;color:#00ff9d;">• Online</span></h2>
+                <button onclick="connectPuter()" style="background:none;border:1px solid #00ff9d;color:#00ff9d;padding:8px 16px;border-radius:999px;cursor:pointer;">
+                    <i class="fas fa-cloud"></i> Connect Puter
+                </button>
+            </div>
+            
+            <div class="chat-container" id="chat">
+                <div class="message ai">
+                    Hello! I'm RodAI.<br>
+                    I can help you with files, code, and more.<br>
+                    Try uploading a file or asking me to create one.
+                </div>
+            </div>
+            
+            <div class="input-area">
+                <div class="input-box">
+                    <input type="text" id="userInput" placeholder="Ask RodAI anything..." onkeypress="if(event.key==='Enter') sendMessage()">
+                    <button onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+                </div>
+                <div style="text-align:center;margin-top:12px;font-size:12px;opacity:0.6;">
+                    <input type="file" id="fileInput" multiple style="display:none" onchange="uploadFile(event)">
+                    <button onclick="document.getElementById('fileInput').click()" 
+                            style="background:none;border:none;color:#00ff9d;cursor:pointer;">
+                        <i class="fas fa-upload"></i> Upload Files
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Files Panel -->
+        <div class="files-panel">
+            <div class="panel-header">Puter Files</div>
+            <div class="file-list" id="fileList">
+                <p style="text-align:center;opacity:0.6;padding:20px;">Connect to Puter to see your files</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let puterConnected = false;
+
+        async function connectPuter() {
+            try {
+                await puter.showUI();
+                puterConnected = true;
+                alert("✅ Connected to Puter successfully!");
+                loadFiles();
+            } catch (e) {
+                alert("Could not connect to Puter.");
+            }
+        }
+
+        async function loadFiles() {
+            if (!puterConnected) return;
+            const files = await puter.fs.readdir('/');
+            const fileList = document.getElementById('fileList');
+            fileList.innerHTML = '';
+            
+            files.forEach(file => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `<i class="fas fa-file"></i> ${file.name}`;
+                div.onclick = () => readFile(file.name);
+                fileList.appendChild(div);
+            });
+        }
+
+        async function readFile(filename) {
+            try {
+                const content = await puter.fs.read(filename);
+                addMessage(`File: <b>${filename}</b><br><pre style="background:#000;padding:10px;border-radius:8px;max-height:300px;overflow:auto;">${content}</pre>`, 'ai');
+            } catch (e) {
+                addMessage("Could not read file.", 'ai');
+            }
+        }
+
+        async function uploadFile(e) {
+            if (!puterConnected) {
+                alert("Please connect to Puter first!");
+                return;
+            }
+            
+            const files = e.target.files;
+            for (let file of files) {
+                try {
+                    await puter.fs.write(file.name, file);
+                    addMessage(`✅ Uploaded: ${file.name}`, 'ai');
+                } catch (err) {
+                    addMessage(`❌ Failed to upload ${file.name}`, 'ai');
+                }
+            }
+            loadFiles();
+        }
+
+        function addMessage(text, type) {
+            const chat = document.getElementById('chat');
+            const msg = document.createElement('div');
+            msg.className = `message ${type}`;
+            msg.innerHTML = text;
+            chat.appendChild(msg);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text) return;
+            
+            addMessage(text, 'user');
+            input.value = '';
+            
+            // Simulate AI thinking
+            setTimeout(() => {
+                addMessage("I'm RodAI. What would you like me to do with files today?", 'ai');
+            }, 600);
+        }
+
+        // Show files panel (demo)
+        function showFiles() {
+            alert("Files panel is already visible on the right →");
+        }
+
+        // Welcome message
+        window.onload = () => {
+            console.log("%cRodAI ready! Powered by Puter.js", "color:#00ff9d;font-size:14px");
+        };
+    </script>
+</body>
+</html>
